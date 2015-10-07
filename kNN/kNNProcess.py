@@ -1,4 +1,14 @@
+import math
 from attributeDescriptor import AttributeType
+
+def get_z_scaling(raw_value, mean, standard_dev):
+    return round((raw_value - mean) / standard_dev, 2)
+
+def get_standard_deviation(N, raw_values, mean):
+    sum_value = 0.0
+    for i in range(0, N):
+        sum_value += pow(raw_values[i] - mean, 2)
+    return round(math.sqrt(sum_value/N), 2)
 
 class KNNProcess:
 
@@ -8,6 +18,7 @@ class KNNProcess:
         self.missing_identifier = '?'
         self.medians = None
         self.means = None
+        self.standard_deviations = None
 
     def get_mean(self, attribute_index, label=None):
         if self.means is None:
@@ -17,10 +28,13 @@ class KNNProcess:
         else:
             return self.means[attribute_index]['overall']
 
+    def get_attribute_indices(self, attr_type):
+        return [i for i in range(0, len(self.attribute_descriptors)) if self.attribute_descriptors[i].get_attribute_type() == attr_type]
+
     def set_means(self):
         if len(self.examples) == 0:
             return
-        continuous_indices = [i for i in range(0,len(self.attribute_descriptors)) if self.attribute_descriptors[i].get_attribute_type() == AttributeType.CONTINUOUS]
+        continuous_indices = self.get_attribute_indices(AttributeType.CONTINUOUS)
         self.means = {}
         for index in continuous_indices:
             non_missing = filter(lambda x: x[index] != self.missing_identifier, self.examples)
@@ -36,14 +50,14 @@ class KNNProcess:
             self.means[index] = {}
             positive_sum = sum(positive_labels)
             negative_sum = sum(negative_labels)
-            self.means[index]['+'] = positive_sum/len(positive_labels)
-            self.means[index]['-'] = negative_sum/len(negative_labels)
-            self.means[index]['overall'] = (positive_sum + negative_sum)/len(attribute_values)
+            self.means[index]['+'] = round(positive_sum/len(positive_labels), 2)
+            self.means[index]['-'] = round(negative_sum/len(negative_labels), 2)
+            self.means[index]['overall'] = round((positive_sum + negative_sum)/len(attribute_values), 2)
 
     def set_medians(self):
         if len(self.examples) == 0:
             return
-        nominal_indices = [i for i in range(0,len(self.attribute_descriptors)) if self.attribute_descriptors[i].get_attribute_type() == AttributeType.NOMINAL]
+        nominal_indices = self.get_attribute_indices(AttributeType.NOMINAL)
         self.medians = {}
         for index in nominal_indices:
             attribute_values = map(lambda x: x[index], self.examples)
@@ -56,11 +70,24 @@ class KNNProcess:
             self.set_medians()
         return self.medians[attribute_index]
 
-    def get_standard_deviation(self, attr):
-        return None
 
-    def get_normalized_value(self, raw_value):
-        return None
+    def set_standard_deviations(self):
+        if len(self.examples) == 0:
+            return
+        continuous_indices = self.get_attribute_indices(AttributeType.CONTINUOUS)
+        self.standard_deviations = {}
+        for index in continuous_indices:
+            # Assumption: No missing values in data.
+            # Assumption: Means are pre-computed.
+            attribute_values = map(lambda x: float(x[index]), self.examples)
+            self.standard_deviations[index] = get_standard_deviation(len(self.examples), attribute_values, self.means[index]['overall'])
+
+    def get_normalized_value(self, attribute_index, raw_value):
+        if self.means is None:
+            self.set_means()
+        if self.standard_deviations is None:
+            self.set_standard_deviations()
+        return get_z_scaling(float(raw_value), self.means[attribute_index]['overall'], self.standard_deviations[attribute_index])
 
     def get_missing_nominal_value(self, attribute_index, example_value):
         if example_value != self.missing_identifier:
@@ -85,10 +112,22 @@ class KNNProcess:
 
         return imputed_line
 
+    def normalize_line(self, line):
+        normalized_line = []
+        for i in range(0, len(line)):
+            attribute_descriptor = self.attribute_descriptors[i]
+            if attribute_descriptor.get_attribute_type() == AttributeType.CONTINUOUS:
+                normalized_line.append(self.get_normalized_value(i, line[i]))
+            else:
+                normalized_line.append(line[i])
+
+        return normalized_line
+
     def replace_missing_line(self, line_no):
         if line_no < 0 or line_no > len(self.examples) - 1:
             raise ValueError('Invalid line number')
         line = self.examples[line_no]
         if len(line) != len(self.attribute_descriptors):
             raise Exception('Invalid number of attributes in example')
-        return self.replace_missing_value(line)
+        self.examples[line_no] = self.replace_missing_value(line)
+        return self.examples[line_no]
