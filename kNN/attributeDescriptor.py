@@ -18,7 +18,7 @@ class AttributeDescriptor:
         return self.attribute_values
 
 
-def get_attribute_descriptors():
+def get_ca_attribute_descriptors():
     attributes = []
 
     attribute = AttributeDescriptor(AttributeType.NOMINAL, ['b', 'a'])
@@ -55,3 +55,14 @@ def get_attribute_descriptors():
     attributes.append(attribute)
 
     return attributes
+
+def get_lenses_attribute_descriptors():
+    num_of_attributes = 4
+    attributes = [None]*num_of_attributes
+    attributes[0] = AttributeDescriptor(AttributeType.NOMINAL, ['1','2','3'])
+    attributes[1] = AttributeDescriptor(AttributeType.NOMINAL, ['1','2'])
+    attributes[2] = AttributeDescriptor(AttributeType.NOMINAL, ['1','2'])
+    attributes[3] = AttributeDescriptor(AttributeType.NOMINAL, ['1','2'])
+
+    return attributes
+

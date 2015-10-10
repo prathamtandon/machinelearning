@@ -2,13 +2,13 @@ import math
 from attributeDescriptor import AttributeType
 
 def get_z_scaling(raw_value, mean, standard_dev):
-    return round((raw_value - mean) / standard_dev, 2)
+    return (raw_value - mean) / standard_dev
 
 def get_standard_deviation(N, raw_values, mean):
     sum_value = 0.0
     for i in range(0, N):
         sum_value += pow(raw_values[i] - mean, 2)
-    return round(math.sqrt(sum_value/N), 2)
+    return math.sqrt(sum_value/N)
 
 class KNNProcess:
 
@@ -50,9 +50,9 @@ class KNNProcess:
             self.means[index] = {}
             positive_sum = sum(positive_labels)
             negative_sum = sum(negative_labels)
-            self.means[index]['+'] = round(positive_sum/len(positive_labels), 2)
-            self.means[index]['-'] = round(negative_sum/len(negative_labels), 2)
-            self.means[index]['overall'] = round((positive_sum + negative_sum)/len(attribute_values), 2)
+            self.means[index]['+'] = positive_sum/len(positive_labels)
+            self.means[index]['-'] = negative_sum/len(negative_labels)
+            self.means[index]['overall'] = (positive_sum + negative_sum)/len(attribute_values)
 
     def set_medians(self):
         if len(self.examples) == 0:

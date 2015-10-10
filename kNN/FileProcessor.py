@@ -8,13 +8,12 @@ class FileProcessor:
         self.lines = []
 
     def parse_input_file(self):
-        if self.filepath == '' or self.delimiter == '':
+        if self.filepath == [] or self.delimiter == '':
             raise ValueError('File path not specified')
         with open(self.filepath, 'rb') as examples_file:
             examples_reader = csv.reader(examples_file, delimiter = self.delimiter)
             for row in examples_reader:
                 self.lines.append(row)
-
         return self.lines
 
     def get_lines_as_array(self):
