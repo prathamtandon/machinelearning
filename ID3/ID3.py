@@ -54,6 +54,7 @@ def group_by_values(examples, attr):
 def get_best_classifier_attr(examples, target_attr, attrs):
     inf_gains = {}
     entropy_all = entropy(len(examples), get_target_value_counts(examples, target_attr))
+    print 'entropy(examples): ' + str(entropy_all)
     for attr in attrs:
         grouped = group_by_values(examples, attr)
         entropies = []
@@ -67,12 +68,13 @@ def get_best_classifier_attr(examples, target_attr, attrs):
     max_info_gain = -float('inf')
 
     for attr in inf_gains:
+        print '(' + str(attr) + '): ' + str(inf_gains[attr])
         if inf_gains[attr] > max_info_gain:
             max_info_gain_attr = attr
             max_info_gain = inf_gains[attr]
 
-
-
+    print 'max info gain: ' + str(max_info_gain_attr)
+    print '========================================================================'
     return max_info_gain_attr
 
 def ID3(examples, target_attribute, attributes):
@@ -105,4 +107,31 @@ def inf_gain(ent, training_set_size, label_sizes, label_values):
         res += (label_sizes[i]/float(training_set_size)) * label_values[i]
 
     return ent-res
+
+def main():
+    training_examples = []
+    attributes = ['age', 'prescription', 'astigmatic', 'tear rate']
+    training_examples.append({'age':1,'prescription':1,'astigmatic':1,'tear rate':1, 'lenses':3})
+    training_examples.append({'age':1,'prescription':1,'astigmatic':1,'tear rate':2, 'lenses':2})
+    training_examples.append({'age':1,'prescription':2,'astigmatic':1,'tear rate':1, 'lenses':3})
+    training_examples.append({'age':1,'prescription':2,'astigmatic':1,'tear rate':2, 'lenses':2})
+    training_examples.append({'age':1,'prescription':2,'astigmatic':2,'tear rate':1, 'lenses':3})
+    training_examples.append({'age':1,'prescription':2,'astigmatic':2,'tear rate':2, 'lenses':1})
+    training_examples.append({'age':2,'prescription':1,'astigmatic':1,'tear rate':1, 'lenses':3})
+    training_examples.append({'age':2,'prescription':1,'astigmatic':1,'tear rate':2, 'lenses':2})
+    training_examples.append({'age':2,'prescription':1,'astigmatic':2,'tear rate':2, 'lenses':1})
+    training_examples.append({'age':2,'prescription':2,'astigmatic':1,'tear rate':1, 'lenses':3})
+    training_examples.append({'age':2,'prescription':2,'astigmatic':2,'tear rate':1, 'lenses':3})
+    training_examples.append({'age':2,'prescription':2,'astigmatic':2,'tear rate':2, 'lenses':3})
+    training_examples.append({'age':3,'prescription':1,'astigmatic':1,'tear rate':2, 'lenses':3})
+    training_examples.append({'age':3,'prescription':1,'astigmatic':2,'tear rate':1, 'lenses':3})
+    training_examples.append({'age':3,'prescription':1,'astigmatic':2,'tear rate':2, 'lenses':1})
+    training_examples.append({'age':3,'prescription':2,'astigmatic':1,'tear rate':1, 'lenses':3})
+    training_examples.append({'age':3,'prescription':2,'astigmatic':2,'tear rate':1, 'lenses':3})
+    training_examples.append({'age':3,'prescription':2,'astigmatic':2,'tear rate':2, 'lenses':3})
+
+    dec_tree = ID3(training_examples, 'lenses', attributes)
+
+if __name__ == '__main__':
+    main()
 
