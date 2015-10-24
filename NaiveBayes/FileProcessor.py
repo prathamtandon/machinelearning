@@ -10,10 +10,10 @@ class FileProcessor:
     def parse_input_file(self):
         if self.filepath == [] or self.delimiter == '':
             raise ValueError('File path not specified')
-        with open(self.filepath, 'rb') as examples_file:
-            examples_reader = csv.reader(examples_file, delimiter = self.delimiter, skipinitialspace=True, quotechar='%')
-            for row in examples_reader:
-                self.lines.append(row)
+        with open(self.filepath, 'rb') as example_file:
+            for line in example_file:
+                line = line.rstrip('\n')
+                self.lines.append(line.split(self.delimiter))
         return self.lines
 
     def get_lines_as_array(self):

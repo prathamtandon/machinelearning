@@ -19,9 +19,8 @@ def test_naive_bayes(hypothises):
             log_sum = 0
 
             for word in exclude_label:
-                if word in densities:
-                    log_sum += log(densities[word], 2)
-
+                log_sum += log(densities[word], 2)
+                    
             cur_sum = log_sum + log_prior
             if cur_sum > max_sum:
                 max_sum = cur_sum
