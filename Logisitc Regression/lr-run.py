@@ -1,5 +1,11 @@
 #!/usr/bin/python
 
+# Usage:
+# command line: ./lr-run.py
+# generates 'predictions.lr' inside output folder
+# To generate confusion matrix:
+# /output>perl evaluate.pl labels.txt predictions.lr
+
 from learner import learn_logistic_regression
 from test_lr import test_logistic_regression
 
@@ -9,3 +15,4 @@ def main():
 
 if __name__ == '__main__':
         main()
+
