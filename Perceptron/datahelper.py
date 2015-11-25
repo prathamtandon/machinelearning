@@ -1,6 +1,6 @@
 from file_processor import FileProcessor
 from random import sample
-from constants import training_fraction, testing_fraction
+from constants import training_size, testing_size
 
 class PartitionResult:
     def __init__(self):
@@ -12,18 +12,17 @@ def get_difference(d1, d2):
         return get_difference(d2,d1)
     return list(set(d1) - set(d2))
 
-
-def partition_data (filename):
+def file_read (filename):
     fp = FileProcessor (filename, ' ')
-    dataset = fp.get_lines_as_array ()
-    
+    return fp.get_lines_as_array ()
+
+
+def partition_data (dataset):
     training_pool = [i for i in range(0,len(dataset))]
-    training_pos = sample(training_pool, 
-                        int(training_fraction * len(training_pool)))
+    training_pos = sample(training_pool, training_size)
     
     testing_pool = get_difference(training_pool, training_pos)
-    testing_pos = sample(testing_pool,
-                        int(testing_fraction * len(testing_pool)))
+    testing_pos = sample(testing_pool, testing_size)
     
     return_val = PartitionResult ()
     
