@@ -2,7 +2,6 @@ from constants import num_rounds
 from constants import winnow_params_with_margin
 from constants import winnow_params_without_margin
 from constants import count_mistakes_dimensions
-from constants import winnow_threshold
 
 class WinnowParams:
     def __init__(self):
@@ -31,7 +30,7 @@ def get_params_helper (dimensions, training_set, testing_set, gamma_range, eta_r
             accuracy = 0
             result = winnow_train (dimensions, training_set, gamma, eta)
             weights = result
-            accuracy = winnow_test (testing_set, gamma, weights)
+            accuracy = winnow_test (testing_set, weights)
             print 'accuracy: ' + str(accuracy)
             if accuracy > cur_best_accuracy:
                 print 'UPDATING CUR BEST'
@@ -70,8 +69,8 @@ def winnow_get_params (n_val, D1, D2):
     return return_val
 
 
-def get_label (x, w):
-    sum_val = -winnow_threshold
+def get_label (x, w, threshold):
+    sum_val = -threshold
     for xi in x:
         pos = xi.split(':')[0]
         pos = int(pos)
@@ -90,23 +89,25 @@ def update_weight_vector (w, eta, y, x):
 def winnow_train (dimensions, training, gamma, eta):
     w = [1.0] * (dimensions + 1)
     t = 0
-    winnow_threshold = len(training) / 2
+    threshold = dimensions / 2
     
     for t in range(1, num_rounds + 1):
         for row in training:
             actual_label = 1 if row[0] == '+1' else -1
-            hypothesis_result = get_label (row[1:], w)
+            hypothesis_result = get_label (row[1:], w, threshold)
             if hypothesis_result * actual_label <= gamma:
                 w = update_weight_vector (w, eta, actual_label, row[1:])
     return w
 
-def winnow_test (testing, gamma, w):
+def winnow_test (testing, w):
     accurate = 0
+    threshold = len(w) / 2
     
     for row in testing:
         actual_label = 1 if row[0] == '+1' else -1
-        hypothesis_result = get_label (row[1:], w)
-        if hypothesis_result * actual_label > gamma:
+        hypothesis_result = get_label (row[1:], w, threshold)
+        predicted_label = 1 if hypothesis_result >= 0 else -1
+        if actual_label == predicted_label:
             accurate += 1
             
     return accurate
@@ -115,5 +116,5 @@ def winnow_mistake_count (dataset, winnow_params):
     w = winnow_params.weight_vector
     gamma = winnow_params.gamma
     
-    return len(dataset) - winnow_test (dataset, gamma, w)
+    return len(dataset) - winnow_test (dataset, w)
 

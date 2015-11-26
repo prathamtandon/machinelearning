@@ -8,4 +8,3 @@ winnow_params_without_margin = [[0],[1.1,1.01,1.005,1.0005,1.0001]]
 winnow_params_with_margin = [[2.0,0.3,0.04,0.006,0.001],
                         [1.1,1.01,1.005,1.0005,1.0001]]
 num_rounds = 20
-winnow_threshold = 2500
