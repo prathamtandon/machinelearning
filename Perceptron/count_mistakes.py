@@ -15,9 +15,6 @@ def count_mistakes_perceptron (n_val, dataset, training, testing):
                                 perceptron_params_without_margin)
     mistakes_with_margin = perceptron_mistake_count (dataset, 
                                 perceptron_params_with_margin)
-                                
-    print 'percp without margin: ' + str(mistakes_without_margin)
-    print 'percp with margin: ' + str(mistakes_with_margin)
     
     return (mistakes_without_margin, mistakes_with_margin)
 
@@ -30,9 +27,6 @@ def count_mistakes_winnow (n_val, dataset, training, testing):
                                 winnow_params_without_margin)
     mistakes_with_margin = winnow_mistake_count (dataset,
                                 winnow_params_with_margin)
-    
-    print 'winnow without marign: ' + str(mistakes_without_margin)
-    print 'winnow with margin: ' + str(mistakes_with_margin)
     
     return (mistakes_without_margin, mistakes_with_margin)
     

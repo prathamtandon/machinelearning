@@ -4,8 +4,8 @@ import java.util.Random;
 public class GenerateLMN {
 
     public static int l = 10;
-    public static int m = 100;
-    public static int n = 500;
+    public static int m = 20;
+    public static int n = 200;
     
     public static int instances = 50000;
     

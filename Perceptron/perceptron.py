@@ -1,7 +1,8 @@
 from constants import num_rounds
 from constants import perceptron_params_with_margin
 from constants import perceptron_params_without_margin
-from constants import count_mistakes_dimensions
+from constants import count_mistakes_dimensions, learning_curves_dimensions
+from constants import survival_count
 
 class PerceptronParams:
     def __init__(self):
@@ -28,13 +29,11 @@ def get_params_helper (dimensions, training_set, testing_set, gamma_range, eta_r
     for gamma in gamma_range:
         for eta in eta_range:
             print 'gamma: ' + str(gamma) + ' eta: ' + str(eta)
-            accuracy = 0
             result = perceptron_train (dimensions, training_set, gamma, eta)
             weights = result[0]
             bias = result[1]
             mistakes_so_far = perceptron_test (testing_set, weights, bias)
             if mistakes_so_far[len(mistakes_so_far)-1] < cur_best_mistakes:
-                print 'UPDATING CUR BEST'
                 cur_best_mistakes = mistakes_so_far[len(mistakes_so_far)-1]
                 cur_best.gamma = gamma
                 cur_best.eta = eta
@@ -43,10 +42,34 @@ def get_params_helper (dimensions, training_set, testing_set, gamma_range, eta_r
     
     return cur_best
     
+def perceptron_mistakes_survive (dataset, params):
+    gamma = params.gamma
+    eta = params.eta
+    dimensions = len(params.weight_vector)
+    w = [0.0] * (dimensions + 1)
+    b = 0.0
+    mistakes = 0
+    instances_seen_without_mistakes = 0
+    best_survival_count_achieved = 0
     
+    for row in dataset:
+        actual_label = 1 if row[0] == '+1' else -1
+        hypothesis_result = get_label (row[1:], w, b)
+        if actual_label * hypothesis_result > gamma:
+            instances_seen_without_mistakes += 1
+            if instances_seen_without_mistakes >= survival_count:
+                print 'survived with: ' + str(survival_count)
+                return mistakes
+        else:
+            mistakes += 1
+            best_survival_count_achieved = instances_seen_without_mistakes
+            instances_seen_without_mistakes = 0
+            w = update_weight_vector (w, eta, actual_label, row[1:])
+            b = update_bias (b, eta, actual_label)
+    
+    print 'try with a new value of S: ' + str(best_survival_count_achieved)
 
-def perceptron_get_params (n_val, D1, D2):
-    dimensions = count_mistakes_dimensions[n_val]
+def perceptron_get_params (dimensions, D1, D2):
     
     print 'Running perceptron without margin...'
     gamma_range = perceptron_params_without_margin[0]
@@ -56,6 +79,7 @@ def perceptron_get_params (n_val, D1, D2):
     print '\nbest gamma: ' + str(params_without_margin.gamma)
     print 'best eta: ' + str(params_without_margin.eta)
     
+    '''
     print '\n\nRunning perceptron with margin...'
     gamma_range = perceptron_params_with_margin[0]
     eta_range = perceptron_params_with_margin[1]
@@ -63,10 +87,10 @@ def perceptron_get_params (n_val, D1, D2):
     
     print 'best gamma: ' + str(params_with_margin.gamma)
     print 'best eta: ' + str(params_with_margin.eta)
-    
+    '''
     return_val = PerceptronResult ()
     return_val.params_without_margin = params_without_margin
-    return_val.params_with_margin = params_with_margin
+    #return_val.params_with_margin = params_with_margin
     
     return return_val
 
@@ -110,20 +134,17 @@ def perceptron_train (dimensions, training, gamma, eta):
 
 def perceptron_test (testing, w, b):
     accurate = 0
-    actual_pos = 0
-    actual_neg = 0
     mistakes = [0]
-    instance_count = 0
     
-    for row in testing:
+    for i in range(len(testing)):
+        row = testing[i]
         actual_label = 1 if row[0] == '+1' else -1
         hypothesis_result = get_label (row[1:], w, b)
         predicted_label = 1 if hypothesis_result >= 0 else -1
         if actual_label == predicted_label:
             accurate += 1
-        instance_count += 1
-        if instance_count % 100 == 0:
-            mistakes.append (instance_count - accurate)
+        if (i + 1) % 100 == 0:
+            mistakes.append ((i + 1) - accurate)
 
     return mistakes
 
