@@ -22,19 +22,17 @@ class WinnowResult:
 
 def get_params_helper (dimensions, training_set, testing_set, gamma_range, eta_range):    
     cur_best = WinnowParams ()
-    cur_best_accuracy = -float('inf')
+    cur_best_mistakes = float('inf')
     
     for gamma in gamma_range:
         for eta in eta_range:
             print 'gamma: ' + str(gamma) + ' eta: ' + str(eta)
-            accuracy = 0
             result = winnow_train (dimensions, training_set, gamma, eta)
             weights = result
-            accuracy = winnow_test (testing_set, weights)
-            print 'accuracy: ' + str(accuracy)
-            if accuracy > cur_best_accuracy:
+            mistakes_so_far = winnow_test (testing_set, weights)
+            if mistakes_so_far[len(mistakes_so_far)-1] < cur_best_mistakes:
                 print 'UPDATING CUR BEST'
-                cur_best_accuracy = accuracy
+                cur_best_mistakes = mistakes_so_far[len(mistakes_so_far)-1]
                 cur_best.gamma = gamma
                 cur_best.eta = eta
                 cur_best.weight_vector = list (weights)
@@ -102,6 +100,8 @@ def winnow_train (dimensions, training, gamma, eta):
 def winnow_test (testing, w):
     accurate = 0
     threshold = len(w) / 2
+    instance_count = 0
+    mistakes = [0]
     
     for row in testing:
         actual_label = 1 if row[0] == '+1' else -1
@@ -109,12 +109,15 @@ def winnow_test (testing, w):
         predicted_label = 1 if hypothesis_result >= 0 else -1
         if actual_label == predicted_label:
             accurate += 1
+        instance_count += 1
+        if instance_count % 100 == 0:
+            mistakes.append (instance_count - accurate)
             
-    return accurate
+    return mistakes
         
 def winnow_mistake_count (dataset, winnow_params):
     w = winnow_params.weight_vector
     gamma = winnow_params.gamma
     
-    return len(dataset) - winnow_test (dataset, w)
+    return winnow_test (dataset, w)
 

@@ -23,7 +23,7 @@ class PerceptronResult:
 
 def get_params_helper (dimensions, training_set, testing_set, gamma_range, eta_range):    
     cur_best = PerceptronParams ()
-    cur_best_accuracy = -float('inf')
+    cur_best_mistakes = float('inf')
     
     for gamma in gamma_range:
         for eta in eta_range:
@@ -32,11 +32,10 @@ def get_params_helper (dimensions, training_set, testing_set, gamma_range, eta_r
             result = perceptron_train (dimensions, training_set, gamma, eta)
             weights = result[0]
             bias = result[1]
-            accuracy = perceptron_test (testing_set, weights, bias)
-            print 'accuracy: ' + str(accuracy)
-            if accuracy > cur_best_accuracy:
+            mistakes_so_far = perceptron_test (testing_set, weights, bias)
+            if mistakes_so_far[len(mistakes_so_far)-1] < cur_best_mistakes:
                 print 'UPDATING CUR BEST'
-                cur_best_accuracy = accuracy
+                cur_best_mistakes = mistakes_so_far[len(mistakes_so_far)-1]
                 cur_best.gamma = gamma
                 cur_best.eta = eta
                 cur_best.weight_vector = list (weights)
@@ -113,6 +112,8 @@ def perceptron_test (testing, w, b):
     accurate = 0
     actual_pos = 0
     actual_neg = 0
+    mistakes = [0]
+    instance_count = 0
     
     for row in testing:
         actual_label = 1 if row[0] == '+1' else -1
@@ -120,14 +121,17 @@ def perceptron_test (testing, w, b):
         predicted_label = 1 if hypothesis_result >= 0 else -1
         if actual_label == predicted_label:
             accurate += 1
+        instance_count += 1
+        if instance_count % 100 == 0:
+            mistakes.append (instance_count - accurate)
 
-    return accurate
+    return mistakes
 
 def perceptron_mistake_count (dataset, perceptron_params):
     w = perceptron_params.weight_vector
     b = perceptron_params.bias
     
-    return len(dataset) - perceptron_test (dataset, w ,b)
+    return perceptron_test (dataset, w ,b)
     
     
         
