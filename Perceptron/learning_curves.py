@@ -16,11 +16,6 @@ def learn_curves_perceptron (n_val, dataset, training, testing):
                                 perceptron_params_without_margin)
     
     return mistakes_without_margin
-    '''
-    mistakes_with_margin = perceptron_mistakes_survive (dataset,
-                                perceptron_params_with_margin)
-    '''
-    #return (mistakes_without_margin, mistakes_with_margin)
 
 def learn_curves_winnow (n_val, dataset, training, testing):
     dimensions = learning_curves_dimensions[n_val]
@@ -29,16 +24,16 @@ def learn_curves_winnow (n_val, dataset, training, testing):
     winnow_params_without_margin = winnow_params.get_params (0)
     winnow_params_with_margin = winnow_params.get_params (1)
     
-    mistakes_without_margin = winnow_mistakes_survive (dataset, 
-                                winnow_params_without_margin)
+    mistakes_with_margin = winnow_mistakes_survive (dataset, 
+                                winnow_params_with_margin)
     
-    return mistakes_without_margin
+    return mistakes_with_margin
 
 def learn_curves (n_val):
     dataset = file_read (learning_curves_datasets[n_val])
     partition = partition_data (dataset)
-    return learn_curves_perceptron (n_val, dataset, partition.training, partition.testing)
-    #return learn_curves_winnow (n_val, dataset, partition.training, partition.testing)
+    #return learn_curves_perceptron (n_val, dataset, partition.training, partition.testing)
+    return learn_curves_winnow (n_val, dataset, partition.training, partition.testing)
 
 def main ():
     plot_learning_curves([
@@ -54,8 +49,8 @@ def main ():
         learn_curves (4)
         ],
         learning_curves_dimensions,
-        'perceptron_without_margin_lc',
-        'perceptron without margin'
+        'winnow_with_margin_lc',
+        'winnow with margin'
     )
 
 if __name__ == '__main__':

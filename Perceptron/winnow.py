@@ -9,6 +9,7 @@ class WinnowParams:
         self.gamma = 0
         self.eta = 0
         self.weight_vector = []
+        self.accuracy = 0.0
 
 class WinnowResult:
     def __init__ (self):
@@ -36,7 +37,7 @@ def get_params_helper (dimensions, training_set, testing_set, gamma_range, eta_r
                 cur_best.gamma = gamma
                 cur_best.eta = eta
                 cur_best.weight_vector = list (weights)
-    
+                cur_best.accuracy = 1.0 - float (cur_best_mistakes) / len(testing_set)
     return cur_best
     
 def winnow_mistakes_survive (dataset, params):
@@ -66,7 +67,7 @@ def winnow_mistakes_survive (dataset, params):
     print 'try with a new value of S: ' + str(best_survival_count_achieved)
 
 def winnow_get_params (dimensions, D1, D2):
-    
+    '''
     print 'Running winnow without margin...'
     gamma_range = winnow_params_without_margin[0]
     eta_range = winnow_params_without_margin[1]
@@ -83,10 +84,10 @@ def winnow_get_params (dimensions, D1, D2):
     
     print 'best gamma: ' + str(params_with_margin.gamma)
     print 'best eta: ' + str(params_with_margin.eta)
-    '''
+    
     return_val = WinnowResult ()
-    return_val.params_without_margin = params_without_margin
-    #return_val.params_with_margin = params_with_margin
+    #return_val.params_without_margin = params_without_margin
+    return_val.params_with_margin = params_with_margin
     
     return return_val
 

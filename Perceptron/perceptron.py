@@ -10,6 +10,7 @@ class PerceptronParams:
         self.eta = 0
         self.weight_vector = []
         self.bias = 0
+        self.accuracy = 0.0
 
 class PerceptronResult:
     def __init__ (self):
@@ -39,6 +40,7 @@ def get_params_helper (dimensions, training_set, testing_set, gamma_range, eta_r
                 cur_best.eta = eta
                 cur_best.weight_vector = list (weights)
                 cur_best.bias = bias
+                cur_best.accuracy = 1.0 - (float (cur_best_mistakes) / len (testing_set))
     
     return cur_best
     
@@ -78,7 +80,6 @@ def perceptron_get_params (dimensions, D1, D2):
     
     print '\nbest gamma: ' + str(params_without_margin.gamma)
     print 'best eta: ' + str(params_without_margin.eta)
-    
     '''
     print '\n\nRunning perceptron with margin...'
     gamma_range = perceptron_params_with_margin[0]
