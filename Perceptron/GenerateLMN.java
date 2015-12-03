@@ -4,10 +4,10 @@ import java.util.Random;
 public class GenerateLMN {
 
     public static int l = 10;
-    public static int m = 1000;
-    public static int n = 1000;
+    public static int m = 20;
+    public static int n = 120;
     
-    public static int instances = 10000;
+    public static int instances = 50000;
     
     public static double labelNoise = 0.0;	// 0.05 for part 3
     public static double featureNoise = 0.0;	// 0.001 for part 3

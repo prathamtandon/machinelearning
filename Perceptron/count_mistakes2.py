@@ -242,12 +242,16 @@ def main ():
     print '\ncounting cumulative mistakes on N = 50,000 dataset...'
     print 'current algorithm: perceptron without margin'
     cumulative_mistakes_perc = perceptron_test (dataset, best_hyperparams_perc.weight_vector, best_hyperparams_perc.bias, instance_intervals)
+    print 'mistakes made, M: ' + str(cumulative_mistakes_perc[len(cumulative_mistakes_perc) - 1])
     print 'current algorithm: perceptron with margin'
     cumulative_mistakes_perc_margin = perceptron_test (dataset, best_hyperparams_perc_margin.weight_vector, best_hyperparams_perc_margin.bias, instance_intervals)
+    print 'mistakes made, M: ' + str(cumulative_mistakes_perc[len(cumulative_mistakes_perc) - 1])
     print 'current algorithm: winnow without margin'
     cumulative_mistakes_winnow = winnow_test (dataset, best_hyperparams_winnow.weight_vector, instance_intervals)
+    print 'mistakes made, M: ' + str(cumulative_mistakes_perc[len(cumulative_mistakes_perc) - 1])
     print 'current algorithm: winnow with margin'
     cumulative_mistakes_winnow_margin = winnow_test (dataset, best_hyperparams_winnow_margin.weight_vector, instance_intervals)
+    print 'mistakes made, M: ' + str(cumulative_mistakes_perc[len(cumulative_mistakes_perc) - 1])
     ################ Plot mistakes versus instances for current n value ##########
     plot_cumulative_mistakes_versus_instances (cumulative_mistakes_perc, cumulative_mistakes_perc_margin, cumulative_mistakes_winnow, cumulative_mistakes_winnow_margin)
     
